@@ -113,3 +113,7 @@ El observatorio analiza desde un reto registrado: distingue autonomía, pistas, 
 Los errores del tutor distinguen permisos (403), cuota (429), modelo no disponible (404) y tiempo de espera. Si Gemini falla, se identifica la explicación preparada y se muestra al docente el último error sanitizado, sin claves ni respuestas crudas del proveedor. El último error es temporal y se borra al recibir una respuesta correcta del servicio o reiniciar el servidor.
 
 Si aparece 403, comprueba en Google AI Studio el acceso del proyecto y en Google Cloud las restricciones de la clave y la disponibilidad de Generative Language API. Un error genérico de acceso no permite identificar por sí solo qué restricción concreta lo causa. No es lo mismo que agotar una cuota de solicitudes (429).
+
+## Publicar en Vercel
+
+Esta versión incluye soporte para un solo despliegue de Vercel con frontend en `public/` y API en `api/index.js` (rutas `/api/*`). Consulta **[DEPLOY-VERCEL.md](DEPLOY-VERCEL.md)** para las instrucciones. En Vercel, los datos y las sesiones solo son persistentes al conectar Upstash Redis; sin base de datos externa, el modo temporal puede perder las partidas. No subas `.env` ni datos personales de menores.

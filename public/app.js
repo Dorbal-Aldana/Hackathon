@@ -14,6 +14,10 @@ configureSchool({getState:()=>state,shell,escape,heading,metricCards,history,nam
 
 async function api(url, body) {
   const response = await fetch(`/api/${url}`, body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    throw new Error('La API no respondió con JSON. Comprueba las rutas /api y la configuración del proyecto en Vercel.');
+  }
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || 'No pudimos conectar con el servidor.');
   return data;

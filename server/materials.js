@@ -1,6 +1,7 @@
 import { fork } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { courses } from './curriculum.js';
+import { parseMaterialBytes } from './material-parser.js';
 export async function extractMaterial(body) {
   const course = courses.find(c => c.id === body.subject);
   if (!course || !course.topics.some(t => t.id === body.topic)) throw new Error('Selecciona una materia y un tema compatibles.');
@@ -18,7 +19,9 @@ export async function extractMaterial(body) {
     if (!['txt', 'md', 'pdf', 'docx'].includes(extension)) throw new Error('Usa TXT, Markdown, PDF con texto o Word DOCX.');
     if (extension === 'pdf' && bytes.subarray(0,5).toString() !== '%PDF-') throw new Error('El archivo no es un PDF válido.');
     if (extension === 'docx' && bytes.subarray(0,2).toString() !== 'PK') throw new Error('El archivo no es un DOCX válido.');
-    text = await new Promise((resolve, reject) => {
+    text = process.env.VERCEL
+      ? await parseMaterialBytes(bytes, extension)
+      : await new Promise((resolve, reject) => {
       const worker = fork(new URL('./material-worker.js', import.meta.url), [], { execArgv: ['--max-old-space-size=128'], stdio: ['ignore', 'ignore', 'ignore', 'ipc'], windowsHide: true });
       let received = false;
       const timer = setTimeout(() => { worker.kill(); reject(new Error('El documento tardó demasiado. Usa un archivo más pequeño.')); }, 12000);
